@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync').create();
 var browserify = require('browserify');
+var concat = require('gulp-concat')
 var source = require('vinyl-source-stream');
 var bundle = require('gulp-bundle-assets');
 var bulk = require('bulk-require');
@@ -43,6 +44,7 @@ gulp.task('sass', () => {
 
 gulp.task('scripts', () => {
   return gulp.src(files.js.src)
+    .pipe(concat('site.js'))
     .pipe(gulp.dest(files.js.dist));
 });
 
