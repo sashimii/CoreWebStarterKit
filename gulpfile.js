@@ -12,25 +12,28 @@ var files = {
     src: 'src/scss/*.scss',
     dist: 'dist/css/'
   },
-  js: {
+  foundationJs: {
     src: [
       'node_modules/jquery/dist/jquery.js',
       'node_modules/what-input/dist/what-input.js',
       'node_modules/foundation-sites/dist/js/foundation.min.js',
-      'src/js/*.js'
+      'src/vendor/js/*.js'
     ],
+    dist: 'dist/js/'
+  },
+  appJs: {
+    src: 'src/js/app.js',
     dist: 'dist/js/'
   }
 }
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'scripts'], () => {
-
+gulp.task('serve', ['sass', 'foundation-scripts', 'app-scripts'], () => {
     browserSync.init({
         server: './'
     });
-
     gulp.watch(files.css.src, ['sass']);
+    gulp.watch('src/js/*.js', ['script-watch']);
     gulp.watch('*.html').on('change', browserSync.reload);
 });
 
@@ -42,10 +45,24 @@ gulp.task('sass', () => {
     .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', () => {
-  return gulp.src(files.js.src)
-    .pipe(concat('site.js'))
-    .pipe(gulp.dest(files.js.dist));
+gulp.task('foundation-scripts', () => {
+  return gulp.src(files.foundationJs.src)
+    .pipe(concat('foundation-scripts.js'))
+    .pipe(gulp.dest(files.foundationJs.dist));
+});
+
+gulp.task('app-scripts', () => {
+  return browserify(files.appJs.src)
+    .bundle()
+    //Pass desired output filename to vinyl-source-stream
+    .pipe(source('app.js'))
+    // Start piping stream to tasks!
+    .pipe(gulp.dest(files.appJs.dist));
+});
+
+gulp.task('script-watch', ['foundation-scripts', 'app-scripts'], (done) => {
+  browserSync.reload()
+  done();
 });
 
 
