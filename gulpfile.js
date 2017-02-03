@@ -61,7 +61,7 @@ gulp.task('app-scripts', () => {
 });
 
 gulp.task('script-watch', ['foundation-scripts', 'app-scripts'], (done) => {
-  browserSync.reload()
+  browserSync.reload();
   done();
 });
 
