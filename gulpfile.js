@@ -6,11 +6,22 @@ var source = require('vinyl-source-stream');
 var bundle = require('gulp-bundle-assets');
 var bulk = require('bulk-require');
 var sass = require('gulp-sass');
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
+var jpegtran = require('imagemin-jpegtran');
 
 var files = {
   css: {
     src: 'src/scss/*.scss',
     dist: 'dist/css/'
+  },
+  fonts: {
+    src: 'src/fonts/*',
+    dist: 'dist/fonts/'
+  },
+  images: {
+    src: 'src/img/*',
+    dist: 'dist/img/'
   },
   foundationJs: {
     src: [
@@ -28,13 +39,37 @@ var files = {
 }
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'foundation-scripts', 'app-scripts'], () => {
+gulp.task('serve', ['fonts', 'images', 'sass', 'foundation-scripts', 'app-scripts'], () => {
     browserSync.init({
         server: './'
     });
     gulp.watch(files.css.src, ['sass']);
+    gulp.watch(files.images.src, ['images']);
+    gulp.watch(files.fonts.src, ['fonts']);
     gulp.watch('src/js/*.js', ['script-watch']);
     gulp.watch('*.html').on('change', browserSync.reload);
+});
+
+// Fonts
+gulp.task('fonts', () => {
+  return gulp.src(files.fonts.src)
+    .pipe(gulp.dest(files.fonts.dist))
+    .pipe(browserSync.stream());
+});
+
+// Images
+gulp.task('images', () => {
+  return gulp.src(files.images.src)
+    .pipe(
+      imagemin(
+        {
+            progressive: true,
+            use: [pngquant(), jpegtran()]
+        }
+      )
+    )
+    .pipe(gulp.dest(files.images.dist))
+    .pipe(browserSync.stream());
 });
 
 // Compile sass into CSS & auto-inject into browsers
