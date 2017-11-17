@@ -11,6 +11,10 @@ var pngquant = require('imagemin-pngquant');
 var jpegtran = require('imagemin-jpegtran');
 
 var files = {
+  html: {
+    src: ['src/**/*.html', 'src/*.html'],
+    dist: 'dist/'
+  },
   css: {
     src: 'src/scss/*.scss',
     dist: 'dist/css/'
@@ -39,15 +43,15 @@ var files = {
 }
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['fonts', 'images', 'sass', 'foundation-scripts', 'app-scripts'], () => {
+gulp.task('serve', ['fonts', 'images', 'sass', 'foundation-scripts', 'app-scripts', 'html'], () => {
     browserSync.init({
-        server: './'
+        server: './dist/'
     });
     gulp.watch(files.css.src, ['sass']);
     gulp.watch(files.images.src, ['images']);
     gulp.watch(files.fonts.src, ['fonts']);
     gulp.watch('src/js/*.js', ['script-watch']);
-    gulp.watch('*.html').on('change', browserSync.reload);
+    gulp.watch('src/*.html').on('change', browserSync.reload);
 });
 
 // Fonts
@@ -71,6 +75,21 @@ gulp.task('images', () => {
     .pipe(gulp.dest(files.images.dist))
     .pipe(browserSync.stream());
 });
+
+// HTML
+gulp.task('html', () => {
+    gulp.src('src/index.html')
+      // .pipe(data(getJsonData))
+      // .pipe(swig({defaults: { cache: false }}))
+      .pipe(gulp.dest(files.html.dist))
+      .pipe(browserSync.reload({stream:true}))
+      .on('error', swallowError);
+});
+
+function swallowError (error) {
+  console.log(error)
+  // this.emit('end')
+}
 
 // Compile sass into CSS & auto-inject into browsers
 gulp.task('sass', () => {

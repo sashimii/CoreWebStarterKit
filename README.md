@@ -10,6 +10,8 @@
 
 ## Usage
 
-Install: `npm install`
+Install NodeJS: https://nodejs.org/en/
+
+Install your dependancies from your root folder: `npm install`
 
 Run Dev Server: `gulp`
